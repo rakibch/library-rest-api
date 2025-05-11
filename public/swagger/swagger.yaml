@@ -1,0 +1,223 @@
+openapi: 3.0.0
+info:
+  title: Library Content Management API
+  version: 1.0.0
+  description: A RESTful API to manage bookshelves, books, chapters, and pages.
+servers:
+  - url: http://localhost:8000/api
+
+components:
+  securitySchemes:
+    SanctumAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Bookshelf:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        location:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
+
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+        bookshelf_id:
+          type: integer
+        title:
+          type: string
+        author:
+          type: string
+        published_year:
+          type: integer
+        created_at:
+          type: string
+        updated_at:
+          type: string
+
+    Chapter:
+      type: object
+      properties:
+        id:
+          type: integer
+        book_id:
+          type: integer
+        title:
+          type: string
+        chapter_number:
+          type: integer
+
+    Page:
+      type: object
+      properties:
+        id:
+          type: integer
+        chapter_id:
+          type: integer
+        page_number:
+          type: integer
+        content:
+          type: string
+
+security:
+  - SanctumAuth: []
+
+paths:
+  /login:
+    post:
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: Successful login
+
+  /logout:
+    post:
+      summary: Logout
+      security:
+        - SanctumAuth: []
+      responses:
+        200:
+          description: Successful logout
+
+  /bookshelves:
+    get:
+      summary: List all bookshelves
+      security:
+        - SanctumAuth: []
+      responses:
+        200:
+          description: OK
+    post:
+      summary: Create a bookshelf
+      security:
+        - SanctumAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Bookshelf'
+      responses:
+        201:
+          description: Created
+
+  /bookshelves/{id}:
+    get:
+      summary: Get a single bookshelf
+      security:
+        - SanctumAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+    put:
+      summary: Update a bookshelf
+      security:
+        - SanctumAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Bookshelf'
+      responses:
+        200:
+          description: OK
+    delete:
+      summary: Delete a bookshelf
+      security:
+        - SanctumAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Deleted
+
+  /books:
+    get:
+      summary: List all books
+      security:
+        - SanctumAuth: []
+      responses:
+        200:
+          description: OK
+    post:
+      summary: Create a book
+      security:
+        - SanctumAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        201:
+          description: Created
+
+  /chapters/{id}/full-content:
+    get:
+      summary: Get full content of a chapter
+      security:
+        - SanctumAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Full chapter content
+
+  /search-books:
+    get:
+      summary: Search books by title or author
+      security:
+        - SanctumAuth: []
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of matching books
